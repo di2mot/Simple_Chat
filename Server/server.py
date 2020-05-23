@@ -70,22 +70,23 @@ class Server:
         while not self.kill_treads:
             try:
                 conn, adr = self.sock.accept()
-                cTread = threading.Thread(target=self.heandler, args=(conn, adr))
-                cTread.demon = True
-                cTread.start()
-                self.conections.append(conn)
-                data = self.conections
-
-                # adr это tuple, adr[0] -ip, adr[1] - port
-                # просто рисуем крисивый вывод
-                text = 'Connetcted'
-                print(' ' * (len(text) + len(str(adr[0])) // 2),
-                      'ip  ', ' ' * (len(str(adr[1])) // 2), 'port')
-
-                print(f'[{text}: {adr[0]} {adr[1]}]')
             except OSError as erore:
                 print(erore)
-        sys.exit(1)
+            cTread = threading.Thread(target=self.heandler, args=(conn, adr))
+            cTread.demon = True
+            cTread.start()
+            self.conections.append(conn)
+            data = self.conections
+
+            # adr это tuple, adr[0] -ip, adr[1] - port
+            # просто рисуем крисивый вывод
+            text = 'Connetcted'
+            print(' ' * (len(text) + len(str(adr[0])) // 2),
+                      'ip  ', ' ' * (len(str(adr[1])) // 2), 'port')
+
+            print(f'[{text}: {adr[0]} {adr[1]}]')
+
+        # sys.exit(1)
 
     def dict_to_json(self, data):
         '''
