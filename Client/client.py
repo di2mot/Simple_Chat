@@ -8,6 +8,8 @@ import json
 
 class Client:
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    status = None
+    login_pass = []
 
     def send_message(self):
         while True:
@@ -19,9 +21,30 @@ class Client:
                 sys.exit(1)         # выходим из скрипта
 
             try:
+                '''
+                Что тут происходит: если статуc reg - т.е. предлагаем человеку зарегестрироваться
+                Просим ввести логин, пароль, доавляем это в login_pass, а потом отправляем на сервер
+                '''
+
+                if self.status == 'reg':
+                    print('Введите логин')
+                    message = input(f'[{time.strftime("%X")}] ')
+                    self.login_pass.append(messege)
+                    print('Введите ')
+                    message = input(f'[{time.strftime("%X")}] ')
+                    self.login_pass.append(messege)
+
+                    messege = self.message(message_type='reg', message_text=self.login_pass)
+
+                    self.sock.send(bytes(message, 'utf-8'))
+
+                    self.status = None
+
+                    continue
 
                 # print('Send message: ', end='')
-                message = input()
+                message = input(f'[{time.strftime("%X")}] ')
+
                 if message == '/stop':          # для выхода из программы
                     self.kill_treads = True     # выключает главный цикл
                     self.sock.close()           # закрывает сокет. В читающем потоке будет брошено исключение
@@ -36,7 +59,9 @@ class Client:
         self.kill_treads = False
         # запускаем сервер, заставляя слушать локалхост
         self.sock.connect(('localhost', 4242))
-        print('Соединение активированно\n')
+
+        print('Соединение установленно\n')
+
         thread = threading.Thread(target=self.send_message)
         thread.daemon = True
         thread.start()
@@ -44,8 +69,8 @@ class Client:
         while not self.kill_treads:
             try:
                 data = self.sock.recv(1024)
-            except: break
-
+            except:
+                break
 
             if not data:
                 break
@@ -54,9 +79,9 @@ class Client:
 
             if message == None:
                 pass
+
             else:
                 print(f'[{from_id}]=> {message}')
-
 
     def byte_to_json(self, data):
         '''
@@ -65,9 +90,9 @@ class Client:
         :return: message_text', 'from_id' / message_info
         '''
 
-
         '''
-        b'{"message_type": "system", "message_info": true, "sistem_code": null, "from_id": null, "message_text": null}'
+        b'{"message_type": "system", "message_info": true, "sistem_code": null,
+         "from_id": null, "message_text": null}'
         '''
 
         byte_to_str = str(data, 'utf-8')
@@ -75,12 +100,16 @@ class Client:
         # Load the JSON to a Python list & dump it back out as formatted JSON
         jsonText = json.loads(byte_to_str)
 
-        # if jsonText['message_type'] == 'message':
-        return jsonText['message_text'], jsonText['from_id'], jsonText["message_info"]
+        if jsonText['message_type'] == 'message':
+            return jsonText['message_text'], jsonText['from_id'], jsonText["message_info"]
 
-        # elif jsonText['message_type'] == 'system':
-        #     return jsonText["message_info"]
+        elif jsonText['message_type'] == 'reg':
+            self.status = 'reg'
+            return True
 
+        elif jsonText['message_type'] == 'sing_in':
+            self.status = 'login'
+            return True
 
     def dict_to_json(self, data):
         '''
@@ -111,7 +140,7 @@ class Client:
         '''
 
         :param self:
-        :param message_type: можкт быть 'message' / 'sistem'
+        :param message_type: можкт быть 'message' / 'sistem' / 'reg'
             'message' - означает что передаётся тестовое соощение
             'sistem' - костыль, передаёт True
 
@@ -148,7 +177,7 @@ class Client:
         }
 
         if message_type == 'system':
-            return  self.dict_to_json(messege)
+            return self.dict_to_json(messege)
 
         elif message_type == 'message':
             messege['message_type'] = message_type
@@ -156,7 +185,6 @@ class Client:
             messege['message_text'] = str(message_text, 'utf-8')
 
             return self.dict_to_json(messege)
-
 
 
 if __name__ == '__main__':
