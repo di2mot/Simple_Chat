@@ -75,6 +75,7 @@ class Client:
             if not data:
                 break
 
+            print(self.byte_to_json(data))
             message, from_id, info = self.byte_to_json(data)
 
             if message == None:
@@ -105,7 +106,7 @@ class Client:
 
         elif jsonText['message_type'] == 'reg':
             self.status = 'reg'
-            return True
+            return jsonText['message_text'], jsonText['from_id'], jsonText["message_info"]
 
         elif jsonText['message_type'] == 'sing_in':
             self.status = 'login'

@@ -125,11 +125,10 @@ class Server:
 
             # если порт не в словаре то просим зарегестироваться
             if adr not in self.users_dict:
-                text = bytes('Авторизируйтесь', 'utf-8')
+                text = 'Sign in'
                 system_msg = self.message(message_type='reg', from_id=[
                                       'localhost', '4242'], message_text=text)
 
-                print(system_msg)
                 conn.send(bytes(system_msg, 'utf-8'))
 
             cTread = threading.Thread(target=self.heandler, args=(conn, adr))
@@ -198,6 +197,7 @@ class Server:
  '''
 
         bytes_text = json.dumps(data)
+
         return bytes_text
 
     def byte_to_json(self, data):
@@ -277,7 +277,7 @@ class Server:
         elif message_type == 'reg':
             messege['message_type'] = message_type
             messege['from_id'] = f'{from_id[0]}:{from_id[1]}'
-            messege['message_text'] = str(message_text, 'utf-8')
+            messege['message_text'] = message_text
             return self.dict_to_json(messege)
 
     def draw_con(self, type, adr):
