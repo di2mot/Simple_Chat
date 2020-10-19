@@ -60,12 +60,12 @@ class Server:
             elif adr not in self.users_dict: # если нет в словаре то регистрация
 
                 type = self.byte_to_json(data)
-
+                print(f'[line 63] type: {type}')
                 if type['message_type'] == 'reg':
 
                     login_pass = type['message_text']
 
-                    passwd = self.sql_get_pass(login_pass[0])
+                    passwd = self.sql_get_pass(login_pass[1])
 
                     if passwd == login_pass[1]:
                         system_msg = self.message(
@@ -208,6 +208,8 @@ class Server:
 
         byte_to_str = str(data, 'utf-8')
 
+        print(f'[line 211]  data: {byte_to_str}')
+
         # Load the JSON to a Python list & dump it back out as formatted JSON
         jsonText = json.loads(byte_to_str)
 
@@ -218,7 +220,7 @@ class Server:
             return jsonText["message_info"]
 
         elif jsonText['message_type'] == 'reg':
-            return jsonText["message_text"]
+            return jsonText
 
     def message(self, message_type='system',
                 message_info=True,
