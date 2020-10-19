@@ -29,12 +29,15 @@ class Client:
                 if self.status == 'reg':
                     print('Введите логин')
                     message = input(f'[{time.strftime("%X")}] ')
-                    self.login_pass.append(messege)
-                    print('Введите ')
-                    message = input(f'[{time.strftime("%X")}] ')
-                    self.login_pass.append(messege)
 
-                    messege = self.message(message_type='reg', message_text=self.login_pass)
+                    self.login_pass.append(message)
+
+                    print('Введите ')
+
+                    message = input(f'[{time.strftime("%X")}] ')
+                    self.login_pass.append(message)
+                    print(f'[line 39] login_pass: {self.login_pass}')
+                    message = self.message(message_type='reg', message_text=self.login_pass)
 
                     self.sock.send(bytes(message, 'utf-8'))
 
@@ -185,6 +188,12 @@ class Client:
             messege['from_id'] = from_id
             messege['message_text'] = str(message_text, 'utf-8')
 
+            return self.dict_to_json(messege)
+
+        elif message_type == 'reg':
+            messege['message_type'] = message_type
+            #messege['from_id'] = f'{from_id[0]}:{from_id[1]}'
+            messege['message_text'] = message_text
             return self.dict_to_json(messege)
 
 
